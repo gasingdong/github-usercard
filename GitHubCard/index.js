@@ -1,24 +1,3 @@
-const cards = document.querySelector('.cards');
-if (cards) {
-    axios
-        .get('https://api.github.com/users/gasingdong')
-        .then((response) => {
-        cards.appendChild(createGitHubCard(response.data));
-        return axios.get(response.data.followers_url);
-    })
-        .catch((error) => console.log(error))
-        .then((response) => {
-        const followers = response.data;
-        return Promise.all(followers.map((follower) => axios.get(follower.url)));
-    })
-        .catch((error) => console.log(error))
-        .then((response) => {
-        response.forEach((follower) => {
-            cards.appendChild(createGitHubCard(follower.data));
-        });
-    })
-        .catch((error) => console.log(error));
-}
 function createGitHubCard(data) {
     const appendChild = (parent, ...children) => children.forEach((child) => parent.appendChild(child));
     const card = document.createElement('div');
@@ -62,4 +41,40 @@ function createGitHubCard(data) {
     appendChild(cardInfo, name, username, location, profile, followers, following, bio, expandButton, calendar);
     appendChild(profile, link);
     return card;
+}
+function getGitHubUserCards(username) {
+    const cards = document.querySelector('.cards');
+    if (cards) {
+        while (cards.firstChild) {
+            cards.removeChild(cards.firstChild);
+        }
+        axios
+            .get(`https://api.github.com/users/${username}`)
+            .then((response) => {
+            cards.appendChild(createGitHubCard(response.data));
+            return axios.get(response.data.followers_url);
+        })
+            .catch((error) => console.log(error))
+            .then((response) => {
+            const followers = response.data;
+            return Promise.all(followers.map((follower) => axios.get(follower.url)));
+        })
+            .catch((error) => console.log(error))
+            .then((response) => {
+            response.forEach((follower) => {
+                cards.appendChild(createGitHubCard(follower.data));
+            });
+        })
+            .catch((error) => console.log(error));
+    }
+}
+const form = document.querySelector('form');
+if (form) {
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const input = form.querySelector('input');
+        if (input) {
+            getGitHubUserCards(input.value);
+        }
+    });
 }

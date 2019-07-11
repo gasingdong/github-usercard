@@ -15,37 +15,6 @@ export {};
            create a new component and add it to the DOM as a child of .cards
 */
 
-const cards: HTMLElement | null = document.querySelector('.cards');
-
-if (cards) {
-  axios
-    .get('https://api.github.com/users/gasingdong')
-    .then(
-      (response: any): Promise<any> => {
-        cards.appendChild(createGitHubCard(response.data));
-        return axios.get(response.data.followers_url);
-      }
-    )
-    .catch((error: any): void => console.log(error))
-    .then(
-      (response: any): Promise<any> => {
-        const followers: any[] = response.data;
-        return Promise.all(
-          followers.map(
-            (follower: any): Promise<any> => axios.get(follower.url)
-          )
-        );
-      }
-    )
-    .catch((error: any): void => console.log(error))
-    .then((response: any): void => {
-      response.forEach((follower: any): void => {
-        cards.appendChild(createGitHubCard(follower.data));
-      });
-    })
-    .catch((error: any): void => console.log(error));
-}
-
 /* Step 5: Now that you have your own card getting added to the DOM, either 
           follow this link in your browser https://api.github.com/users/<Your github name>/followers 
           , manually find some other users' github handles, or use the list found 
@@ -146,4 +115,55 @@ function createGitHubCard(data: any): HTMLElement {
   );
   appendChild(profile, link);
   return card;
+}
+
+function getGitHubUserCards(username: string): void {
+  const cards: HTMLElement | null = document.querySelector('.cards');
+
+  if (cards) {
+    // Clear any current cards
+    while (cards.firstChild) {
+      cards.removeChild(cards.firstChild);
+    }
+
+    axios
+      .get(`https://api.github.com/users/${username}`)
+      .then(
+        (response: any): Promise<any> => {
+          cards.appendChild(createGitHubCard(response.data));
+          return axios.get(response.data.followers_url);
+        }
+      )
+      .catch((error: any): void => console.log(error))
+      .then(
+        (response: any): Promise<any> => {
+          const followers: any[] = response.data;
+          return Promise.all(
+            followers.map(
+              (follower: any): Promise<any> => axios.get(follower.url)
+            )
+          );
+        }
+      )
+      .catch((error: any): void => console.log(error))
+      .then((response: any): void => {
+        response.forEach((follower: any): void => {
+          cards.appendChild(createGitHubCard(follower.data));
+        });
+      })
+      .catch((error: any): void => console.log(error));
+  }
+}
+
+const form: HTMLElement | null = document.querySelector('form');
+
+if (form) {
+  form.addEventListener('submit', (event): void => {
+    event.preventDefault();
+    const input = form.querySelector('input');
+
+    if (input) {
+      getGitHubUserCards(input.value);
+    }
+  });
 }

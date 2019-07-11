@@ -87,10 +87,19 @@ function createGitHubCard(data: any): HTMLElement {
   name.classList.add('name');
   username.classList.add('username');
 
-  link.href = '';
-  img.src = '';
+  link.href = data.html_url;
+  img.src = data.avatar_url;
+  name.textContent = data.name;
+  username.textContent = data.login;
+  location.textContent = `Location: ${data.location}`;
+  profile.textContent = 'Profile:';
+  link.textContent = data.html_url;
+  followers.textContent = data.followers;
+  following.textContent = data.following;
+  bio.textContent = data.bio;
 
-  appendChild(img, cardInfo);
+  appendChild(card, img);
+  appendChild(card, cardInfo);
   appendChild(
     cardInfo,
     name,

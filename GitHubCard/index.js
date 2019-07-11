@@ -3,11 +3,19 @@ if (cards) {
     axios
         .get('https://api.github.com/users/gasingdong')
         .then((response) => {
-        console.log(response);
         cards.appendChild(createGitHubCard(response.data));
+        return axios.get(response.data.followers_url);
+    })
+        .then((response) => {
+        const followers = response.data;
+        return Promise.all(followers.map((follower) => axios.get(follower.url)));
+    })
+        .then((response) => {
+        response.forEach((follower) => {
+            cards.appendChild(createGitHubCard(follower.data));
+        });
     });
 }
-const followersArray = [];
 function createGitHubCard(data) {
     const appendChild = (parent, ...children) => children.forEach((child) => parent.appendChild(child));
     const card = document.createElement('div');

@@ -20,9 +20,26 @@ const cards: HTMLElement | null = document.querySelector('.cards');
 if (cards) {
   axios
     .get('https://api.github.com/users/gasingdong')
+    .then(
+      (response: any): Promise<any> => {
+        cards.appendChild(createGitHubCard(response.data));
+        return axios.get(response.data.followers_url);
+      }
+    )
+    .then(
+      (response: any): Promise<any> => {
+        const followers: any[] = response.data;
+        return Promise.all(
+          followers.map(
+            (follower: any): Promise<any> => axios.get(follower.url)
+          )
+        );
+      }
+    )
     .then((response: any): void => {
-      console.log(response);
-      cards.appendChild(createGitHubCard(response.data));
+      response.forEach((follower: any): void => {
+        cards.appendChild(createGitHubCard(follower.data));
+      });
     });
 }
 
@@ -35,8 +52,6 @@ if (cards) {
           Using that array, iterate over it, requesting data for each user, creating a new card for each
           user, and adding that card to the DOM.
 */
-
-const followersArray = [];
 
 /* Step 3: Create a function that accepts a single object as its only argument,
           Using DOM methods and properties, create a component that will return the following DOM element:

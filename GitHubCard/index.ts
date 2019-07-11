@@ -4,12 +4,16 @@ export {}
            https://api.github.com/users/<your name>
 */
 
+const userData: Promise<any> = axios.get('https://api.github.com/users/gasingdong');
+
 /* Step 2: Inspect and study the data coming back, this is YOUR 
    github info! You will need to understand the structure of this 
    data in order to use it to build your component function 
 
    Skip to Step 3.
 */
+
+console.log(userData);
 
 /* Step 4: Pass the data received from Github into your function, 
            create a new component and add it to the DOM as a child of .cards
@@ -26,7 +30,6 @@ export {}
 */
 
 const followersArray = [];
-
 
 /* Step 3: Create a function that accepts a single object as its only argument,
           Using DOM methods and properties, create a component that will return the following DOM element:
@@ -55,3 +58,7 @@ const followersArray = [];
   luishrd
   bigknell
 */
+
+function createGitHubCard(data: any) : void {
+  
+}

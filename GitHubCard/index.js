@@ -6,15 +6,18 @@ if (cards) {
         cards.appendChild(createGitHubCard(response.data));
         return axios.get(response.data.followers_url);
     })
+        .catch((error) => console.log(error))
         .then((response) => {
         const followers = response.data;
         return Promise.all(followers.map((follower) => axios.get(follower.url)));
     })
+        .catch((error) => console.log(error))
         .then((response) => {
         response.forEach((follower) => {
             cards.appendChild(createGitHubCard(follower.data));
         });
-    });
+    })
+        .catch((error) => console.log(error));
 }
 function createGitHubCard(data) {
     const appendChild = (parent, ...children) => children.forEach((child) => parent.appendChild(child));
@@ -29,10 +32,14 @@ function createGitHubCard(data) {
     const followers = document.createElement('p');
     const following = document.createElement('p');
     const bio = document.createElement('p');
+    const calendar = document.createElement('div');
+    const expandButton = document.createElement('button');
     card.classList.add('card');
     cardInfo.classList.add('card-info');
     name.classList.add('name');
     username.classList.add('username');
+    expandButton.classList.add('expand-button');
+    calendar.classList.add('calendar');
     link.href = data.html_url;
     img.src = data.avatar_url;
     name.textContent = data.name;
@@ -43,9 +50,10 @@ function createGitHubCard(data) {
     followers.textContent = `Followers: ${data.followers}`;
     following.textContent = `Following: ${data.following}`;
     bio.textContent = data.bio;
+    expandButton.textContent = 'Contribution Graph';
     appendChild(card, img);
     appendChild(card, cardInfo);
-    appendChild(cardInfo, name, username, location, profile, followers, following, bio);
+    appendChild(cardInfo, name, username, location, profile, followers, following, bio, expandButton, calendar);
     appendChild(profile, link);
     return card;
 }

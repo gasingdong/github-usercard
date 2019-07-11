@@ -26,6 +26,7 @@ if (cards) {
         return axios.get(response.data.followers_url);
       }
     )
+    .catch((error: any): void => console.log(error))
     .then(
       (response: any): Promise<any> => {
         const followers: any[] = response.data;
@@ -36,11 +37,13 @@ if (cards) {
         );
       }
     )
+    .catch((error: any): void => console.log(error))
     .then((response: any): void => {
       response.forEach((follower: any): void => {
         cards.appendChild(createGitHubCard(follower.data));
       });
-    });
+    })
+    .catch((error: any): void => console.log(error));
 }
 
 /* Step 5: Now that you have your own card getting added to the DOM, either 
@@ -97,11 +100,15 @@ function createGitHubCard(data: any): HTMLElement {
   const followers: HTMLElement = document.createElement('p');
   const following: HTMLElement = document.createElement('p');
   const bio: HTMLElement = document.createElement('p');
+  const calendar: HTMLElement = document.createElement('div');
+  const expandButton: HTMLElement = document.createElement('button');
 
   card.classList.add('card');
   cardInfo.classList.add('card-info');
   name.classList.add('name');
   username.classList.add('username');
+  expandButton.classList.add('expand-button');
+  calendar.classList.add('calendar');
 
   link.href = data.html_url;
   img.src = data.avatar_url;
@@ -113,6 +120,7 @@ function createGitHubCard(data: any): HTMLElement {
   followers.textContent = `Followers: ${data.followers}`;
   following.textContent = `Following: ${data.following}`;
   bio.textContent = data.bio;
+  expandButton.textContent = 'Contribution Graph';
 
   appendChild(card, img);
   appendChild(card, cardInfo);
@@ -124,7 +132,9 @@ function createGitHubCard(data: any): HTMLElement {
     profile,
     followers,
     following,
-    bio
+    bio,
+    expandButton,
+    calendar
   );
   appendChild(profile, link);
   return card;

@@ -4,10 +4,6 @@ export {};
            https://api.github.com/users/<your name>
 */
 
-const userData: Promise<any> = axios
-  .get('https://api.github.com/users/gasingdong')
-  .then((response: any): void => console.log(response));
-
 /* Step 2: Inspect and study the data coming back, this is YOUR 
    github info! You will need to understand the structure of this 
    data in order to use it to build your component function 
@@ -22,7 +18,12 @@ const userData: Promise<any> = axios
 const cards: HTMLElement | null = document.querySelector('.cards');
 
 if (cards) {
-  cards.appendChild(createGitHubCard(userData));
+  axios
+    .get('https://api.github.com/users/gasingdong')
+    .then((response: any): void => {
+      console.log(response);
+      cards.appendChild(createGitHubCard(response.data));
+    });
 }
 
 /* Step 5: Now that you have your own card getting added to the DOM, either 
@@ -92,10 +93,10 @@ function createGitHubCard(data: any): HTMLElement {
   name.textContent = data.name;
   username.textContent = data.login;
   location.textContent = `Location: ${data.location}`;
-  profile.textContent = 'Profile:';
+  profile.textContent = 'Profile: ';
   link.textContent = data.html_url;
-  followers.textContent = data.followers;
-  following.textContent = data.following;
+  followers.textContent = `Followers: ${data.followers}`;
+  following.textContent = `Following: ${data.following}`;
   bio.textContent = data.bio;
 
   appendChild(card, img);

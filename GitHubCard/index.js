@@ -1,9 +1,11 @@
-const userData = axios
-    .get('https://api.github.com/users/gasingdong')
-    .then((response) => console.log(response));
 const cards = document.querySelector('.cards');
 if (cards) {
-    cards.appendChild(createGitHubCard(userData));
+    axios
+        .get('https://api.github.com/users/gasingdong')
+        .then((response) => {
+        console.log(response);
+        cards.appendChild(createGitHubCard(response.data));
+    });
 }
 const followersArray = [];
 function createGitHubCard(data) {
@@ -28,10 +30,10 @@ function createGitHubCard(data) {
     name.textContent = data.name;
     username.textContent = data.login;
     location.textContent = `Location: ${data.location}`;
-    profile.textContent = 'Profile:';
+    profile.textContent = 'Profile: ';
     link.textContent = data.html_url;
-    followers.textContent = data.followers;
-    following.textContent = data.following;
+    followers.textContent = `Followers: ${data.followers}`;
+    following.textContent = `Following: ${data.following}`;
     bio.textContent = data.bio;
     appendChild(card, img);
     appendChild(card, cardInfo);

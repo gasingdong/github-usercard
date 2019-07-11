@@ -33,13 +33,16 @@ function createGitHubCard(data) {
     const following = document.createElement('p');
     const bio = document.createElement('p');
     const calendar = document.createElement('div');
+    const calendarImg = document.createElement('img');
     const expandButton = document.createElement('button');
     card.classList.add('card');
     cardInfo.classList.add('card-info');
+    img.classList.add('avatar');
     name.classList.add('name');
     username.classList.add('username');
     expandButton.classList.add('expand-button');
     calendar.classList.add('calendar');
+    calendarImg.classList.add('calendar-img');
     link.href = data.html_url;
     img.src = data.avatar_url;
     name.textContent = data.name;
@@ -51,8 +54,11 @@ function createGitHubCard(data) {
     following.textContent = `Following: ${data.following}`;
     bio.textContent = data.bio;
     expandButton.textContent = 'Contribution Graph';
+    calendarImg.src = `http://ghchart.rshah.org/${data.login}`;
+    expandButton.addEventListener('click', () => calendarImg.classList.toggle('calendar-show'));
     appendChild(card, img);
     appendChild(card, cardInfo);
+    appendChild(calendar, calendarImg);
     appendChild(cardInfo, name, username, location, profile, followers, following, bio, expandButton, calendar);
     appendChild(profile, link);
     return card;

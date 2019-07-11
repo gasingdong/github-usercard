@@ -102,7 +102,7 @@ body {
   background-color: #FFF;
   margin-bottom: 30px;
 }
-.card img {
+.card .avatar {
   width: 150px;
   height: 150px;
   border-radius: 3px;
@@ -119,6 +119,14 @@ body {
   font-size: 1.8rem;
   font-style: italic;
   margin: 3px 0 10px;
+}
+.card .calendar-img {
+  display: none;
+  width: 100%;
+  margin-top: 20px;
+}
+.card .calendar-show {
+  display: block;
 }
 
 /*# sourceMappingURL=index.css.map */

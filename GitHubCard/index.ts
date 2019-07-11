@@ -59,6 +59,30 @@ const followersArray = [];
   bigknell
 */
 
+const appendChild = (parent: HTMLElement, ...children: HTMLElement[]) => children.forEach(child => parent.appendChild(child));
+
 function createGitHubCard(data: any) : void {
-  
+  const card: HTMLElement = document.createElement('div');
+  const img: HTMLImageElement = document.createElement('img');
+  const cardInfo: HTMLElement = document.createElement('div');
+  const name: HTMLElement = document.createElement('h3');
+  const username: HTMLElement = document.createElement('p');
+  const location: HTMLElement = document.createElement('p');
+  const profile: HTMLElement = document.createElement('p');
+  const link: HTMLAnchorElement = document.createElement('a');
+  const followers: HTMLElement = document.createElement('p');
+  const following: HTMLElement = document.createElement('p');
+  const bio: HTMLElement = document.createElement('p');
+
+  card.classList.add('card');
+  cardInfo.classList.add('card-info');
+  name.classList.add('name');
+  username.classList.add('username');
+
+  link.href = "";
+  img.src = "";
+
+  appendChild(img, cardInfo);
+  appendChild(cardInfo, name, username, location, profile, followers, following, bio);
+  appendChild(profile, link);
 }

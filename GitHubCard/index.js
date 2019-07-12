@@ -1,55 +1,116 @@
-/* Step 1: using axios, send a GET request to the following URL 
-           (replacing the palceholder with your Github name):
-           https://api.github.com/users/<your name>
-*/
-
-/* Step 2: Inspect and study the data coming back, this is YOUR 
-   github info! You will need to understand the structure of this 
-   data in order to use it to build your component function 
-
-   Skip to Step 3.
-*/
-
-/* Step 4: Pass the data received from Github into your function, 
-           create a new component and add it to the DOM as a child of .cards
-*/
-
-/* Step 5: Now that you have your own card getting added to the DOM, either 
-          follow this link in your browser https://api.github.com/users/<Your github name>/followers 
-          , manually find some other users' github handles, or use the list found 
-          at the bottom of the page. Get at least 5 different Github usernames and add them as
-          Individual strings to the friendsArray below.
-          
-          Using that array, iterate over it, requesting data for each user, creating a new card for each
-          user, and adding that card to the DOM.
-*/
-
-const followersArray = [];
-
-/* Step 3: Create a function that accepts a single object as its only argument,
-          Using DOM methods and properties, create a component that will return the following DOM element:
-
-<div class="card">
-  <img src={image url of user} />
-  <div class="card-info">
-    <h3 class="name">{users name}</h3>
-    <p class="username">{users user name}</p>
-    <p>Location: {users location}</p>
-    <p>Profile:  
-      <a href={address to users github page}>{address to users github page}</a>
-    </p>
-    <p>Followers: {users followers count}</p>
-    <p>Following: {users following count}</p>
-    <p>Bio: {users bio}</p>
-  </div>
-</div>
-
-*/
-
-/* List of LS Instructors Github username's: 
-  tetondan
-  dustinmyers
-  justsml
-  luishrd
-  bigknell
-*/
+function createGitHubCard(data) {
+  const appendChild = (parent, ...children) =>
+    children.forEach(child => parent.appendChild(child));
+  const card = document.createElement('div');
+  const img = document.createElement('img');
+  const cardInfo = document.createElement('div');
+  const name = document.createElement('h3');
+  const username = document.createElement('p');
+  const location = document.createElement('p');
+  const profile = document.createElement('p');
+  const link = document.createElement('a');
+  const followers = document.createElement('p');
+  const following = document.createElement('p');
+  const bio = document.createElement('p');
+  const calendar = document.createElement('div');
+  const calendarImg = document.createElement('img');
+  const expandButton = document.createElement('button');
+  card.classList.add('card');
+  cardInfo.classList.add('card-info');
+  img.classList.add('avatar');
+  name.classList.add('name');
+  username.classList.add('username');
+  expandButton.classList.add('expand-button');
+  calendar.classList.add('calendar');
+  calendarImg.classList.add('calendar-img');
+  link.href = data.html_url;
+  img.src = data.avatar_url;
+  name.textContent = data.name;
+  username.textContent = data.login;
+  location.textContent = `Location: ${data.location}`;
+  profile.textContent = 'Profile: ';
+  link.textContent = data.html_url;
+  followers.textContent = `Followers: ${data.followers}`;
+  following.textContent = `Following: ${data.following}`;
+  bio.textContent = data.bio;
+  expandButton.textContent = 'Contribution Graph';
+  calendarImg.src = `http://ghchart.rshah.org/${data.login}`;
+  expandButton.addEventListener('click', () =>
+    calendarImg.classList.toggle('calendar-show')
+  );
+  appendChild(card, img);
+  appendChild(card, cardInfo);
+  appendChild(calendar, calendarImg);
+  appendChild(
+    cardInfo,
+    name,
+    username,
+    location,
+    profile,
+    followers,
+    following,
+    bio,
+    expandButton,
+    calendar
+  );
+  appendChild(profile, link);
+  return card;
+}
+function clearCards() {
+  const cards = document.querySelector('.cards');
+  if (cards) {
+    while (cards.firstChild) {
+      cards.removeChild(cards.firstChild);
+    }
+    return cards;
+  }
+  return cards;
+}
+function showErrorMessage(username, cards) {
+  const errorMessage = document.createElement('p');
+  errorMessage.textContent = `Cannot find user ${username}`;
+  cards.appendChild(errorMessage);
+}
+function getGitHubUserCards(username) {
+  const cards = clearCards();
+  if (cards) {
+    let userData;
+    axios
+      .get(`https://api.github.com/users/${username}`)
+      .then(
+        response => {
+          userData = response.data;
+          return axios
+            .get(response.data.followers_url)
+            .then(response => {
+              const followers = response.data;
+              return Promise.all(
+                followers.map(follower => axios.get(follower.url))
+              );
+            })
+            .catch(error => console.log(error))
+            .then(response => {
+              cards.appendChild(createGitHubCard(userData));
+              response.forEach(follower => {
+                cards.appendChild(createGitHubCard(follower.data));
+              });
+            })
+            .catch(error => console.log(error));
+        },
+        () => {
+          showErrorMessage(username, cards);
+        }
+      )
+      .catch(error => console.log(error));
+  }
+}
+const form = document.querySelector('form');
+if (form) {
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    const input = form.querySelector('input');
+    if (input) {
+      getGitHubUserCards(input.value);
+    }
+  });
+}

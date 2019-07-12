@@ -48,10 +48,11 @@ function getGitHubUserCards(username) {
         while (cards.firstChild) {
             cards.removeChild(cards.firstChild);
         }
+        let userData;
         axios
             .get(`https://api.github.com/users/${username}`)
             .then((response) => {
-            cards.appendChild(createGitHubCard(response.data));
+            userData = response.data;
             return axios.get(response.data.followers_url);
         })
             .catch((error) => console.log(error))
@@ -61,6 +62,7 @@ function getGitHubUserCards(username) {
         })
             .catch((error) => console.log(error))
             .then((response) => {
+            cards.appendChild(createGitHubCard(userData));
             response.forEach((follower) => {
                 cards.appendChild(createGitHubCard(follower.data));
             });

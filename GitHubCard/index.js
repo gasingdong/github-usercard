@@ -60,9 +60,6 @@ function showErrorMessage(username, cards) {
 function getGitHubUserCards(username) {
     const cards = clearCards();
     if (cards) {
-        while (cards.firstChild) {
-            cards.removeChild(cards.firstChild);
-        }
         let userData;
         axios
             .get(`https://api.github.com/users/${username}`)

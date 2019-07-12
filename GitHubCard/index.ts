@@ -140,11 +140,6 @@ function getGitHubUserCards(username: string): void {
   const cards = clearCards();
 
   if (cards) {
-    // Clear any current cards
-    while (cards.firstChild) {
-      cards.removeChild(cards.firstChild);
-    }
-
     let userData: any;
     axios
       .get(`https://api.github.com/users/${username}`)

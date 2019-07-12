@@ -117,7 +117,7 @@ function createGitHubCard(data: any): HTMLElement {
   return card;
 }
 
-function getGitHubUserCards(username: string): void {
+function clearCards(): HTMLElement | null {
   const cards: HTMLElement | null = document.querySelector('.cards');
 
   if (cards) {
@@ -125,33 +125,57 @@ function getGitHubUserCards(username: string): void {
     while (cards.firstChild) {
       cards.removeChild(cards.firstChild);
     }
+    return cards;
+  }
+  return cards;
+}
+
+function showErrorMessage(username: string, cards: HTMLElement): void {
+  const errorMessage: HTMLElement = document.createElement('p');
+  errorMessage.textContent = `Cannot find user ${username}`;
+  cards.appendChild(errorMessage);
+}
+
+function getGitHubUserCards(username: string): void {
+  const cards = clearCards();
+
+  if (cards) {
+    // Clear any current cards
+    while (cards.firstChild) {
+      cards.removeChild(cards.firstChild);
+    }
+
     let userData: any;
     axios
       .get(`https://api.github.com/users/${username}`)
       .then(
         (response: any): Promise<any> => {
           userData = response.data;
-          return axios.get(response.data.followers_url);
-        }
-      )
-      .catch((error: any): void => console.log(error))
-      .then(
-        (response: any): Promise<any> => {
-          const followers: any[] = response.data;
-          return Promise.all(
-            followers.map(
-              (follower: any): Promise<any> => axios.get(follower.url)
+          return axios
+            .get(response.data.followers_url)
+            .then(
+              (response: any): Promise<any> => {
+                const followers: any[] = response.data;
+                return Promise.all(
+                  followers.map(
+                    (follower: any): Promise<any> => axios.get(follower.url)
+                  )
+                );
+              }
             )
-          );
+            .catch((error: any): void => console.log(error))
+            .then((response: any): void => {
+              cards.appendChild(createGitHubCard(userData));
+              response.forEach((follower: any): void => {
+                cards.appendChild(createGitHubCard(follower.data));
+              });
+            })
+            .catch((error: any): void => console.log(error));
+        },
+        (): void => {
+          showErrorMessage(username, cards);
         }
       )
-      .catch((error: any): void => console.log(error))
-      .then((response: any): void => {
-        cards.appendChild(createGitHubCard(userData));
-        response.forEach((follower: any): void => {
-          cards.appendChild(createGitHubCard(follower.data));
-        });
-      })
       .catch((error: any): void => console.log(error));
   }
 }

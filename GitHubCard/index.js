@@ -42,8 +42,23 @@ function createGitHubCard(data) {
     appendChild(profile, link);
     return card;
 }
-function getGitHubUserCards(username) {
+function clearCards() {
     const cards = document.querySelector('.cards');
+    if (cards) {
+        while (cards.firstChild) {
+            cards.removeChild(cards.firstChild);
+        }
+        return cards;
+    }
+    return cards;
+}
+function showErrorMessage(username, cards) {
+    const errorMessage = document.createElement('p');
+    errorMessage.textContent = `Cannot find user ${username}`;
+    cards.appendChild(errorMessage);
+}
+function getGitHubUserCards(username) {
+    const cards = clearCards();
     if (cards) {
         while (cards.firstChild) {
             cards.removeChild(cards.firstChild);
@@ -53,19 +68,22 @@ function getGitHubUserCards(username) {
             .get(`https://api.github.com/users/${username}`)
             .then((response) => {
             userData = response.data;
-            return axios.get(response.data.followers_url);
-        })
-            .catch((error) => console.log(error))
-            .then((response) => {
-            const followers = response.data;
-            return Promise.all(followers.map((follower) => axios.get(follower.url)));
-        })
-            .catch((error) => console.log(error))
-            .then((response) => {
-            cards.appendChild(createGitHubCard(userData));
-            response.forEach((follower) => {
-                cards.appendChild(createGitHubCard(follower.data));
-            });
+            return axios
+                .get(response.data.followers_url)
+                .then((response) => {
+                const followers = response.data;
+                return Promise.all(followers.map((follower) => axios.get(follower.url)));
+            })
+                .catch((error) => console.log(error))
+                .then((response) => {
+                cards.appendChild(createGitHubCard(userData));
+                response.forEach((follower) => {
+                    cards.appendChild(createGitHubCard(follower.data));
+                });
+            })
+                .catch((error) => console.log(error));
+        }, () => {
+            showErrorMessage(username, cards);
         })
             .catch((error) => console.log(error));
     }
